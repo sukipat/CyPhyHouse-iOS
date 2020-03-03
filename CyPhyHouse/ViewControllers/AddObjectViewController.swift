@@ -90,6 +90,7 @@ extension AddObjectViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "objectCell", for: indexPath) as! ObjectCell
         cell.objectImage.image = objects[indexPath.row].image
+        cell.objectLabel.text = objects[indexPath.row].description
         cell.selectionStyle = .none
         cell.layer.backgroundColor = UIColor.clear.cgColor
         return cell

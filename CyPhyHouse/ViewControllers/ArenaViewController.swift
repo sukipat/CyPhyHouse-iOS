@@ -54,6 +54,15 @@ class ArenaViewController: UIViewController {
     }
 
     // MARK: - Actions
+    func removeImageViewAt(center: CGPoint) {
+        for (index, image) in objectImages.enumerated() {
+            if (image.center == center) {
+                arenaObjects.remove(at: index)
+                objectImages.remove(at: index)
+                break
+            }
+        }
+    }
     @objc func didSelectAddObjectButton() {
         addObjectViewController.modalPresentationStyle = .overCurrentContext
         addObjectViewController.transitioningDelegate = addObjectViewController
@@ -68,6 +77,16 @@ class ArenaViewController: UIViewController {
                 viewToDrag.center = CGPoint(x: viewToDrag.center.x + translation.x, y: viewToDrag.center.y + translation.y)
             }
             recognizer.setTranslation(CGPoint.zero, in: view)
+        }
+        
+        if recognizer.state == .ended {
+            if let viewToDrag = recognizer.view {
+                let newCenter = viewToDrag.center
+                if !arenaView.frame.contains(newCenter) {
+                    viewToDrag.removeFromSuperview()
+                    removeImageViewAt(center: newCenter)
+                }
+            }
         }
     }
 

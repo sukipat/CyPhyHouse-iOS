@@ -18,15 +18,27 @@ class ObjectCell: UITableViewCell {
         imageView.backgroundColor = .clear
         return imageView
     }()
-    
+
+    let objectLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = UIColor.white
+        return label
+    }()
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
 
-        self.contentView.addSubview(objectImage)
+        contentView.addSubview(objectLabel)
+        objectLabel.heightAnchor.constraint(equalToConstant: 32.0).isActive = true
+        objectLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
+        objectLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+
+        contentView.addSubview(objectImage)
         objectImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         objectImage.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        objectImage.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         objectImage.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        objectImage.bottomAnchor.constraint(equalTo: objectLabel.topAnchor).isActive = true
     }
     
     required init?(coder: NSCoder) {
