@@ -62,12 +62,10 @@ class ArenaViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     @objc func didPan(recognizer: UIPanGestureRecognizer) {
-        print("ATTEMPTING TO PAN")
         if recognizer.state == .began || recognizer.state == .changed {
             let translation = recognizer.translation(in: arenaView)
             if let view = recognizer.view {
-                view.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: translation.x).isActive = true
-                view.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: translation.y).isActive = true
+                view.center = CGPoint(x: view.center.x + translation.x, y: view.center.y + translation.y)
             }
             recognizer.setTranslation(CGPoint.zero, in: arenaView)
         }
@@ -77,7 +75,7 @@ class ArenaViewController: UIViewController, UIGestureRecognizerDelegate {
 extension ArenaViewController: ObjectDelegate {
     func objectWasSelected(coordinate: CGPoint, object: Object) {
         let newImageView = UIImageView(frame: CGRect(x: coordinate.x, y: coordinate.y, width: 100, height: 100))
-        let panRecognizer = UITapGestureRecognizer(target: self, action: #selector(didPan(recognizer:)))
+        let panRecognizer = UIPanGestureRecognizer(target: self, action: #selector(didPan(recognizer:)))
         newImageView.isUserInteractionEnabled = true
         newImageView.addGestureRecognizer(panRecognizer)
 
