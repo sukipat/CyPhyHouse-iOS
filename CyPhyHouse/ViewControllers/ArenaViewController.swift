@@ -12,7 +12,7 @@ protocol ObjectDelegate {
     func objectWasSelected(coordinate: CGPoint, object: Object)
 }
 
-class ArenaViewController: UIViewController, UIGestureRecognizerDelegate {
+class ArenaViewController: UIViewController {
     // MARK: - Properties
     var arenaObjects = [Object]()
     var objectImages = [UIImageView]()
@@ -63,42 +63,76 @@ class ArenaViewController: UIViewController, UIGestureRecognizerDelegate {
     
     @objc func didPan(recognizer: UIPanGestureRecognizer) {
         if recognizer.state == .began || recognizer.state == .changed {
-            let translation = recognizer.translation(in: arenaView)
-            if let view = recognizer.view {
-                view.center = CGPoint(x: view.center.x + translation.x, y: view.center.y + translation.y)
+            let translation = recognizer.translation(in: view)
+            if let viewToDrag = recognizer.view {
+                viewToDrag.center = CGPoint(x: viewToDrag.center.x + translation.x, y: viewToDrag.center.y + translation.y)
             }
-            recognizer.setTranslation(CGPoint.zero, in: arenaView)
+            recognizer.setTranslation(CGPoint.zero, in: view)
+        }
+    }
+
+    @objc func didPinch(recognizer: UIPinchGestureRecognizer) {
+        if recognizer.state == .ended || recognizer.state == .changed {
+            if let pinchedView = recognizer.view {
+                let currentScale = pinchedView.frame.size.width / pinchedView.bounds.size.width
+                var newScale = currentScale*recognizer.scale
+
+                newScale = newScale < 1 ? 1 : newScale
+                newScale = newScale > 3 ? 3 : newScale
+
+                let transform = CGAffineTransform(scaleX: newScale, y: newScale)
+                pinchedView.transform = transform
+
+                recognizer.scale = 1
+            }
         }
     }
 }
 // MARK: - ObjectDelegate
 extension ArenaViewController: ObjectDelegate {
     func objectWasSelected(coordinate: CGPoint, object: Object) {
-        let newImageView = UIImageView(frame: CGRect(x: coordinate.x, y: coordinate.y, width: 100, height: 100))
+        let defaultWidth: CGFloat = 100.0
+
         let panRecognizer = UIPanGestureRecognizer(target: self, action: #selector(didPan(recognizer:)))
+        panRecognizer.delegate = self
+
+        let newImageView = UIImageView()
+        newImageView.bounds = CGRect(x: 0, y: 0, width: defaultWidth, height: defaultWidth)
+        newImageView.center = coordinate
         newImageView.isUserInteractionEnabled = true
         newImageView.addGestureRecognizer(panRecognizer)
+
+        let pinchRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(didPinch(recognizer:)))
 
         switch object {
         case is DroneGoal:
             let newDrone = DroneGoal(location: coordinate)
             arenaObjects.append(newDrone)
             newImageView.image = newDrone.image
-            arenaView.addSubview(newImageView)
+            view.addSubview(newImageView)
+            objectImages.append(newImageView)
         case is CarGoal:
             let newCar = CarGoal(location: coordinate)
             arenaObjects.append(newCar)
             newImageView.image = newCar.image
-            arenaView.addSubview(newImageView)
+            view.addSubview(newImageView)
+            objectImages.append(newImageView)
         case is Obstacle:
-            let newObstacle = Obstacle(location: coordinate, rad: 30)
+            let newObstacle = Obstacle(location: coordinate, rad: defaultWidth/2)
             arenaObjects.append(newObstacle)
             newImageView.image = newObstacle.image
-            arenaView.addSubview(newImageView)
+            newImageView.addGestureRecognizer(pinchRecognizer)
+            view.addSubview(newImageView)
+            objectImages.append(newImageView)
         default:
             return
         }
-        objectImages.append(newImageView)
+    }
+}
+// MARK: - UIGestureRecognizerDelegate
+extension ArenaViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
 }
 
