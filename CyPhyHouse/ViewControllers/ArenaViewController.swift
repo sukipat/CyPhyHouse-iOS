@@ -63,6 +63,29 @@ class ArenaViewController: UIViewController {
             }
         }
     }
+    
+    func updateObjectAt(center: CGPoint) {
+        for (index, image) in objectImages.enumerated() {
+            if (image.center == center) {
+                arenaObjects[index].coord = center
+                // TODO: - UDP BROADCAST UPDATE
+                break
+            }
+        }
+    }
+
+    func updateObjectRad(center: CGPoint, scale: CGFloat) {
+        for (index, image) in objectImages.enumerated() {
+            if (image.center == center) {
+                if let obstacle = arenaObjects[index] as? Obstacle {
+                    obstacle.radius = obstacle.radius * scale
+                    // TODO: - UDP BROADCAST UPDATE
+                }
+                break
+            }
+        }
+    }
+
     @objc func didSelectAddObjectButton() {
         addObjectViewController.modalPresentationStyle = .overCurrentContext
         addObjectViewController.transitioningDelegate = addObjectViewController
@@ -85,6 +108,8 @@ class ArenaViewController: UIViewController {
                 if !arenaView.frame.contains(newCenter) {
                     viewToDrag.removeFromSuperview()
                     removeImageViewAt(center: newCenter)
+                } else {
+                    updateObjectAt(center: newCenter)
                 }
             }
         }
@@ -102,6 +127,7 @@ class ArenaViewController: UIViewController {
                 let transform = CGAffineTransform(scaleX: newScale, y: newScale)
                 pinchedView.transform = transform
 
+                updateObjectRad(center: pinchedView.center, scale: newScale)
                 recognizer.scale = 1
             }
         }
