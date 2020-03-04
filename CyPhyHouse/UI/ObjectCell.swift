@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 
 class ObjectCell: UITableViewCell {
+    // MARK: - Properties
     let objectImage: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -26,6 +27,7 @@ class ObjectCell: UITableViewCell {
         return label
     }()
 
+    // MARK: - Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
 

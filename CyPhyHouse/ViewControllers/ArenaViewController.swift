@@ -59,6 +59,7 @@ class ArenaViewController: UIViewController {
             if (image.center == center) {
                 arenaObjects.remove(at: index)
                 objectImages.remove(at: index)
+                // TODO: - UDP BROADCAST REMOVAL
                 break
             }
         }
@@ -166,7 +167,7 @@ extension ArenaViewController: ObjectDelegate {
             let newObstacle = Obstacle(location: coordinate, rad: defaultWidth/2)
             arenaObjects.append(newObstacle)
             newImageView.image = newObstacle.image
-            newImageView.addGestureRecognizer(pinchRecognizer)
+//            newImageView.addGestureRecognizer(pinchRecognizer)
             view.addSubview(newImageView)
             objectImages.append(newImageView)
         default:
