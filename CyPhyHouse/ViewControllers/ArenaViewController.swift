@@ -12,6 +12,12 @@ protocol ObjectDelegate {
     func objectWasSelected(coordinate: CGPoint, object: Object)
 }
 
+enum networkReason {
+    case location
+    case removal
+    case resize
+}
+
 class ArenaViewController: UIViewController {
     // MARK: - Properties
     var arenaObjects = [Object]()
@@ -20,6 +26,7 @@ class ArenaViewController: UIViewController {
     let aspectRatio: CGFloat = 0.5
     let addObject = UIButton(type: .contactAdd)
     let addObjectViewController = AddObjectViewController()
+    var tcpSocket = TCPSocketConnection(host: "192.168.1.20", port: 80)
 
     // MARK: - Init
     func setupView() {
@@ -57,9 +64,9 @@ class ArenaViewController: UIViewController {
     func removeImageViewAt(center: CGPoint) {
         for (index, image) in objectImages.enumerated() {
             if (image.center == center) {
+                updateObjectOnNetwork(objectToUpdate: arenaObjects[index], reason: .removal)
                 arenaObjects.remove(at: index)
                 objectImages.remove(at: index)
-                // TODO: - UDP BROADCAST REMOVAL
                 break
             }
         }
@@ -69,7 +76,7 @@ class ArenaViewController: UIViewController {
         for (index, image) in objectImages.enumerated() {
             if (image.center == center) {
                 arenaObjects[index].coord = center
-                // TODO: - UDP BROADCAST UPDATE
+                updateObjectOnNetwork(objectToUpdate: arenaObjects[index], reason: .location)
                 break
             }
         }
@@ -80,7 +87,7 @@ class ArenaViewController: UIViewController {
             if (image.center == center) {
                 if let obstacle = arenaObjects[index] as? Obstacle {
                     obstacle.radius = obstacle.radius * scale
-                    // TODO: - UDP BROADCAST UPDATE
+                    updateObjectOnNetwork(objectToUpdate: obstacle, reason: .resize)
                 }
                 break
             }
@@ -172,6 +179,19 @@ extension ArenaViewController: ObjectDelegate {
             objectImages.append(newImageView)
         default:
             return
+        }
+    }
+}
+// MARK: - TCPSocketActions
+extension ArenaViewController {
+    func updateObjectOnNetwork(objectToUpdate: Object, reason: networkReason) {
+        switch reason {
+        case .location:
+            print("TRYING TO UPDATE LOCATION")
+        case .removal:
+            print("TRYING TO REMOVE OBJECT")
+        case .resize:
+            print("TRYING TO RESIZE")
         }
     }
 }
